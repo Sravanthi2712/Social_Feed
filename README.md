@@ -5,13 +5,13 @@ This project is a **full-stack web application** combining a **Social Feed** sys
 ---
 
 ## 📁 Project Structure
-Social_Feed/
+'''Social_Feed/
 ├── HRMS/
 │ ├── client/ # Frontend React App
 │ └── server/ # Backend Express API
 ├── .gitignore
 ├── README.md
-
+'''
 ---
 
 ## ⚙️ Features
@@ -42,7 +42,7 @@ Social_Feed/
 ### 📦 Installation Steps
 
 1. **Clone the repo**
-```bash
+--bash
 git clone https://github.com/Sravanthi2712/Social_Feed.git
 cd Social_Feed/HRMS
 
