@@ -116,11 +116,19 @@ const Posts = ({user}) => {
   };
 
   const handleShare = (id) => {
-    const shareLink = `https://example.com/post/${id}`;
-    setSharedLinks((prev) => ({ ...prev, [id]: shareLink }));
-    navigator.clipboard.writeText(shareLink);
-    alert("Post link copied to clipboard!");
-  };
+  const post = posts.find((p) => p._id === id);
+
+  if (!post?.image) {
+    alert("No image found to share!");
+    return;
+  }
+
+  const imageLink = post.image;
+  setSharedLinks((prev) => ({ ...prev, [id]: imageLink }));
+  navigator.clipboard.writeText(imageLink);
+  alert("📷 Image link copied to clipboard!");
+};
+
 
   const toggleSave = async (id) => {
     try {

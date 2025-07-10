@@ -51,7 +51,7 @@ router.post("/", async (req, res) => {
       position,
       content,
       image,
-      views: Math.floor(Math.random() * 1000),
+      views: 1,
       likes: 0,
       liked: false,
       comments: [],

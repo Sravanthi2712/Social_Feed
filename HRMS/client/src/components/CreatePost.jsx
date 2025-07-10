@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
-const CreatePost = () => {
+const CreatePost = ({user}) => {
   const [posts, setPosts] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -11,8 +11,9 @@ const CreatePost = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [mentionSuggestions, setMentionSuggestions] = useState([]);
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
-
-  const users = ["@alice", "@bob", "@carol", "@dave"]; // Mentionable users
+  const CURRENT_USER =user
+  
+  //const users = ["@alice", "@bob", "@carol", "@dave"]; // Mentionable users
   const emojiList = [
     "😀", "😁", "😂", "🤣", "😊", "😉", "😍", "🥰", "😘", "😋", "🤪", "😎", "😭", "😤", "😡", "🤯", "🥳", "😅", "🤔",
     "❤", "💕", "💖", "💗", "💘", "💝", "💞", "💟", "❣",
@@ -109,6 +110,9 @@ const CreatePost = () => {
     formData.append("title", newPost.title);
     formData.append("description", newPost.description);
 
+    formData.append("user[name]", CURRENT_USER.name);
+    formData.append("user[role]", CURRENT_USER.role);
+
     if (newPost.mediaFile) {
       formData.append("media", newPost.mediaFile);
     } else {
@@ -201,7 +205,7 @@ const CreatePost = () => {
     const lastWord = value.split(" ").pop();
     if (lastWord.startsWith("@")) {
       const keyword = lastWord.toLowerCase();
-      const suggestions = users.filter((u) => u.toLowerCase().startsWith(keyword));
+      const suggestions = user.filter((u) => u.toLowerCase().startsWith(keyword));
       setMentionSuggestions(suggestions);
     } else {
       setMentionSuggestions([]);

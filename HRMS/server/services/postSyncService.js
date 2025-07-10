@@ -32,11 +32,11 @@ const convertCreatePostToPost = (createPost) => {
     position: randomUser.position,
     content: `${createPost.title}\n\n${createPost.description}`,
     image: createPost.mediaURL || '',
-    views: Math.floor(Math.random() * 1000) + 50, // Random views between 50-1050
-    likes: Math.floor(Math.random() * 100), // Random likes between 0-100
+    views: 1, // Random views between 50-1050
+    likes: 0, // Random likes between 0-100
     liked: false,
     comments: [],
-    shares: Math.floor(Math.random() * 20), // Random shares between 0-20
+    shares: 0, // Random shares between 0-20
     saved: false,
     createdAt: createPost.createdAt || new Date(),
   };
