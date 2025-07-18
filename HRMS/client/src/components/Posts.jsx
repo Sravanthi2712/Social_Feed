@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-
-
 const Posts = ({user}) => {
   const [posts, setPosts] = useState([]);
   const [commentInputs, setCommentInputs] = useState({});
