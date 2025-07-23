@@ -18,6 +18,12 @@ const createPostSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  name: String,
+  position: String,
+  creatorImage: { // <--- ADD THIS FIELD
+    type: String,
+    default: "https://randomuser.me/api/portraits/men/32.jpg", // A default if not provided
+  },
 }, {
   timestamps: true,
 });

@@ -112,7 +112,8 @@ const CreatePost = ({user}) => {
 
     formData.append("user[name]", CURRENT_USER.name);
     formData.append("user[role]", CURRENT_USER.role);
-
+    formData.append("user[image]", CURRENT_USER.image);
+    
     if (newPost.mediaFile) {
       formData.append("media", newPost.mediaFile);
     } else {

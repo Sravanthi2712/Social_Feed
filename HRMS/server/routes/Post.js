@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 
 // Sync all CreatePosts to Posts (manual trigger)
 router.post("/sync", async (req, res) => {
-  try {
+  try {z
     const syncedPosts = await syncAllCreatePostsToPosts();
     res.json({
       message: `Successfully synced ${syncedPosts.length} posts`,
@@ -41,6 +41,7 @@ router.get("/refresh", async (req, res) => {
 });
 
 // Create new post
+/*
 router.post("/", async (req, res) => {
   const { name, position, content, image } = req.body;
   if (!content || !name) return res.status(400).json({ message: "Content and name required" });
@@ -63,6 +64,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+*/
 
 // Toggle like for a post
 router.patch("/:id/like", async (req, res) => {

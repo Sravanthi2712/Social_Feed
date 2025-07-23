@@ -198,7 +198,7 @@ const Posts = ({user}) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <img
-                    src="https://randomuser.me/api/portraits/men/32.jpg"
+                    src={post.creatorImage || "https://randomuser.me/api/portraits/men/32.jpg"}
                     alt="Avatar"
                     className="w-10 h-10 rounded-full"
                   />

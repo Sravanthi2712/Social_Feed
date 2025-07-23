@@ -63,6 +63,10 @@ router.post("/", upload.single('media'), async (req, res, next) => {
     console.log("📄 POST request file:", req.file);
 
     const { title, description } = req.body;
+    const creatorName = req.body.user.name; 
+    const creatorRole = req.body.user.role; 
+    const creatorImage = req.body.user.image;
+
     let mediaURL = "";
     let mediaType = "";
 
@@ -77,6 +81,9 @@ router.post("/", upload.single('media'), async (req, res, next) => {
       description,
       mediaURL: mediaURL,
       mediaType: mediaType,
+      name: creatorName,
+      position: creatorRole, 
+      creatorImage: creatorImage,
     };
 
     const newPost = new CreatePost(newPostData);
@@ -102,6 +109,10 @@ router.post("/", upload.single('media'), async (req, res, next) => {
 router.put("/:id", upload.single('media'), async (req, res, next) => {
   try {
     const { title, description } = req.body;
+    const creatorName = req.body.user.name;
+    const creatorRole = req.body.user.role;
+    const creatorImage = req.body.user.image;
+
     let updateFields = { title, description };
 
     if (req.file) {
@@ -115,21 +126,36 @@ router.put("/:id", upload.single('media'), async (req, res, next) => {
       updateFields.mediaURL = req.body.mediaURL || '';
       updateFields.mediaType = req.body.mediaType || '';
     }
+    updateFields.name = creatorName;
+    updateFields.position = creatorRole;
+    updateFields.creatorImage = creatorImage;
+    
+    console.log("Updating CreatePost with fields:", updateFields);
+    
+    const updatedCreatePost = await CreatePost.findByIdAndUpdate( // Renamed var to avoid confusion
+            req.params.id,
+            updateFields,
+            { new: true, runValidators: true }
+        );
+        if (!updatedCreatePost) {
+            return res.status(404).json({ message: "Post not found" });
+        }
 
-    const updatedPost = await CreatePost.findByIdAndUpdate(
-      req.params.id,
-      updateFields,
-      { new: true, runValidators: true }
-    );
-    if (!updatedPost) {
-      return res.status(404).json({ message: "Post not found" });
+        // After updating CreatePost, ensure the corresponding Post is also updated
+        try {
+            await syncCreatePostToPost(updatedCreatePost._id); // Re-sync to update Post collection
+            console.log('✅ Updated CreatePost and re-synced to Posts collection');
+        } catch (syncError) {
+            console.error('⚠️ Failed to re-sync updated post:', syncError.message);
+        }
+
+        res.status(200).json(updatedCreatePost);
+    } catch (error) {
+        console.error("❌ Error updating post:", error.message);
+        next(error);
     }
-    res.status(200).json(updatedPost);
-  } catch (error) {
-    console.error("❌ Error updating post:", error.message);
-    next(error);
-  }
 });
+
 
 // Delete a post by id
 router.delete("/:id", async (req, res, next) => {

@@ -1,22 +1,12 @@
 const Post = require('../models/Post');
 const CreatePost = require('../models/CreatePost');
+const user = require('../models/user');
 
 /**
  * Service to sync posts from CreatePost collection to Post collection
  * This allows posts created in CreatePost.jsx to appear in Posts.jsx
  */
 
-// Sample user data for random assignment
-const sampleUsers = [
-  { name: "Alice Johnson", position: "HR Manager" },
-  { name: "Bob Smith", position: "Software Engineer" },
-  { name: "Carol Davis", position: "Marketing Specialist" },
-  { name: "David Wilson", position: "Project Manager" },
-  { name: "Emma Brown", position: "UX Designer" },
-  { name: "Frank Miller", position: "Data Analyst" },
-  { name: "Grace Lee", position: "HR Consultant" },
-  { name: "Henry Taylor", position: "DevOps Engineer" },
-];
 
 /**
  * Convert a CreatePost to Post format
@@ -24,14 +14,13 @@ const sampleUsers = [
  * @returns {Object} - Post format object
  */
 const convertCreatePostToPost = (createPost) => {
-  // Randomly assign a user
-  const randomUser = sampleUsers[Math.floor(Math.random() * sampleUsers.length)];
-  
+  const creatorImage = createPost.creatorImage || "https://randomuser.me/api/portraits/men/32.jpg"; 
   return {
-    name: randomUser.name,
-    position: randomUser.position,
+    name: createPost.name,
+    position: createPost.position,
     content: `${createPost.title}\n\n${createPost.description}`,
     image: createPost.mediaURL || '',
+    creatorImage: creatorImage,
     views: 1, // Random views between 50-1050
     likes: 0, // Random likes between 0-100
     liked: false,
@@ -48,42 +37,36 @@ const convertCreatePostToPost = (createPost) => {
  * @returns {Object} - The created Post document
  */
 const syncCreatePostToPost = async (createPostId) => {
-  try {
-    // Find the CreatePost
-    const createPost = await CreatePost.findById(createPostId);
-    if (!createPost) {
-      throw new Error('CreatePost not found');
+    try {
+        const createPost = await CreatePost.findById(createPostId);
+        if (!createPost) {
+            throw new Error('CreatePost not found');
+        }
+
+        // Find existing synced Post by sourceCreatePostId
+        let existingPost = await Post.findOne({ sourceCreatePostId: createPost._id });
+
+        const postData = convertCreatePostToPost(createPost);
+
+        if (existingPost) {
+            // Update existing post
+            Object.assign(existingPost, postData); // Copy new data to existing post
+            const updatedPost = await existingPost.save();
+            console.log('✅ Updated existing synced Post:', createPost.title);
+            return updatedPost;
+        } else {
+            // Create new Post
+            postData.sourceCreatePostId = createPost._id; // Link to original CreatePost
+            const newPost = new Post(postData);
+            const savedPost = await newPost.save();
+            console.log('✅ Successfully synced new CreatePost to Post:', createPost.title);
+            return savedPost;
+        }
+    } catch (error) {
+        console.error('❌ Error syncing CreatePost to Post:', error.message);
+        throw error;
     }
-
-    // Check if already synced using a more specific approach
-    const existingPost = await Post.findOne({
-      $and: [
-        { content: { $regex: createPost.title, $options: 'i' } },
-        { content: { $regex: createPost.description, $options: 'i' } }
-      ]
-    });
-
-    if (existingPost) {
-      console.log('Post already synced:', createPost.title);
-      return existingPost;
-    }
-
-    // Convert and create new Post
-    const postData = convertCreatePostToPost(createPost);
-    // Add reference to original CreatePost for tracking
-    postData.sourceCreatePostId = createPost._id;
-
-    const newPost = new Post(postData);
-    const savedPost = await newPost.save();
-
-    console.log('✅ Successfully synced CreatePost to Post:', createPost.title);
-    return savedPost;
-  } catch (error) {
-    console.error('❌ Error syncing CreatePost to Post:', error.message);
-    throw error;
-  }
 };
-
 /**
  * Sync all CreatePosts to Posts collection
  * @returns {Array} - Array of created Post documents

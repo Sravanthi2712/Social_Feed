@@ -8,7 +8,11 @@ const commentSchema = new mongoose.Schema({
 
 const postSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  position: String,
+  position: { type: String, required: true },
+  creatorImage: { // <--- ADD THIS FIELD
+        type: String,
+        default: "https://randomuser.me/api/portraits/men/32.jpg", // A default if not provided
+  },
   content: { type: String, required: true },
   image: String,
   views: { type: Number, default: 0 },
